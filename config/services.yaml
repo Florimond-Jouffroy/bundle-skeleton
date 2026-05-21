@@ -1,0 +1,6 @@
+services:
+# C'est ici que tu déclareras les services de ton bundle plus tard
+# Exemple:
+# FlorimondJouffroy\MonBundle\Service\MonService:
+#     autowire: true
+#     autoconfigure: true

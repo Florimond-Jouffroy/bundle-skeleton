@@ -1,0 +1,20 @@
+{
+  "name": "florimond-jouffroy/bundle-skeleton",
+  "description": "Bundle réutilisable pour mes applications Symfony.",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Florimond Jouffroy"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "symfony/framework-bundle": "^6.4|^7.0|^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "FlorimondJouffroy\\MonBundle\\": "src/"
+    }
+  }
+}
