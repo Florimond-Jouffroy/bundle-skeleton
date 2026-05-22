@@ -11,7 +11,7 @@ echo -e "${CYAN}====================================================${NC}"
 
 # 1. Collecte des informations
 default_vendor="Ube"
-read -p "🏢 Nom du Vendor (ex: Ube, Florimond) [$default_vendor] : " vendor_name
+read -p "🏢 Nom du Vendor (ex: Ube, Core) [$default_vendor] : " vendor_name
 vendor_name=${vendor_name:-$default_vendor}
 
 default_bundle="Awesome"
@@ -23,7 +23,7 @@ bundle_class="${bundle_name}Bundle"
 namespace="${vendor_name}\\${bundle_class}"
 namespace_escaped="${vendor_name}\\\\${bundle_class}"
 
-# Génération automatique du slug pour composer et alias (ex: ube_awesome ou ube/awesome-bundle)
+# Génération automatique du slug
 vendor_slug=$(echo "$vendor_name" | tr '[:upper:]' '[:lower:]')
 bundle_slug_raw=$(echo "$bundle_name" | sed 's/\([A-Z]\)/_\1/g' | sed 's/^_//' | tr '[:upper:]' '[:lower:]')
 bundle_slug="${vendor_slug}_${bundle_slug_raw}"
@@ -32,15 +32,15 @@ package_name="${vendor_slug}/$(echo "$bundle_name" | sed 's/\([A-Z]\)/-\1/g' | s
 
 echo -e "\n${YELLOW}⏳ Remplacement des patterns dans les fichiers...${NC}"
 
-# 2. Remplacement textuel de tous les jetons d'entreprise
+# 2. Remplacement textuel (Utilisation de | comme séparateur sed pour gérer les antislashs)
 find . -type f \( -name "*.php" -o -name "*.json" -o -name "*.yaml" -o -name "*.md" -o -name "*.xml" -o -name "*.dist" \) ! -name "configure.sh" | while read -r file; do
-    sed -i "s/{{PACKAGE_NAME}}/${package_name}/g" "$file"
-    sed -i "s/{{VENDOR}}/${vendor_name}/g" "$file"
-    sed -i "s/{{BUNDLE}}/${bundle_name}/g" "$file"
-    sed -i "s/{{BUNDLE_CLASS}}/${bundle_class}/g" "$file"
-    sed -i "s/{{BUNDLE_SLUG}}/${bundle_slug}/g" "$file"
-    sed -i "s/{{NAMESPACE}}/${namespace}/g" "$file"
-    sed -i "s/{{NAMESPACE_ESCAPED}}/${namespace_escaped}/g" "$file"
+    sed -i "s|{{PACKAGE_NAME}}|${package_name}|g" "$file"
+    sed -i "s|{{VENDOR}}|${vendor_name}|g" "$file"
+    sed -i "s|{{BUNDLE}}|${bundle_name}|g" "$file"
+    sed -i "s|{{BUNDLE_CLASS}}|${bundle_class}|g" "$file"
+    sed -i "s|{{BUNDLE_SLUG}}|${bundle_slug}|g" "$file"
+    sed -i "s|{{NAMESPACE}}|${namespace}|g" "$file"
+    sed -i "s|{{NAMESPACE_ESCAPED}}|${namespace_escaped}|g" "$file"
 done
 
 # 3. Renommer le fichier physique de la classe de bundle principale
