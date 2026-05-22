@@ -1,52 +1,54 @@
 #!/bin/bash
 
-# Couleurs pour le terminal
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}    📦 CONFIGURATION DE TON NOUVEAU BUNDLE SYMFONY  ${NC}"
+echo -e "${GREEN}    🚀 INIT BUNDLE WORKFLOW (ENTERPRISE STYLE)      ${NC}"
 echo -e "${CYAN}====================================================${NC}"
 
-# 1. Demander le nom du bundle en CamelCase
-default_class="BlogBundle"
-read -p "📝 Nom de la classe du Bundle (CamelCase, ex: CoreBundle, SecurityBundle) [$default_class] : " bundle_class
-bundle_class=${bundle_class:-$default_class}
+# 1. Collecte des informations
+default_vendor="Ube"
+read -p "🏢 Nom du Vendor (ex: Ube, Florimond) [$default_vendor] : " vendor_name
+vendor_name=${vendor_name:-$default_vendor}
 
-# 2. Demander le nom du paquet pour Composer (slug)
-# On transforme automatiquement BlogBundle en blog-bundle pour composer
-default_composer=$(echo "$bundle_class" | sed 's/\([A-Z]\)/-\1/g' | sed 's/^-//' | tr '[:upper:]' '[:lower:]')
-read -p "📦 Nom du paquet Composer (slug, ex: core-bundle) [$default_composer] : " composer_name
-composer_name=${composer_name:-$default_composer}
+default_bundle="Awesome"
+read -p "📦 Nom du Bundle (ex: Awesome, Log, Auth) [$default_bundle] : " bundle_name
+bundle_name=${bundle_name:-$default_bundle}
 
-# Calcul de l'extension pour l'injection de dépendances (ex: BlogExtension)
-extension_class="${bundle_class%Bundle}Extension"
-# Calcul d'un nom propre pour la suite de tests (ex: Blog Bundle)
-test_suite_name=$(echo "$bundle_class" | sed 's/\([A-Z]\)/ \1/g' | sed 's/^ //')
+# Formatage des variables de remplacement
+bundle_class="${bundle_name}Bundle"
+namespace="${vendor_name}\\${bundle_class}"
+namespace_escaped="${vendor_name}\\\\${bundle_class}"
 
-echo -e "\n${YELLOW}⏳ Initialisation des fichiers...${NC}"
+# Génération automatique du slug pour composer et alias (ex: ube_awesome ou ube/awesome-bundle)
+vendor_slug=$(echo "$vendor_name" | tr '[:upper:]' '[:lower:]')
+bundle_slug_raw=$(echo "$bundle_name" | sed 's/\([A-Z]\)/_\1/g' | sed 's/^_//' | tr '[:upper:]' '[:lower:]')
+bundle_slug="${vendor_slug}_${bundle_slug_raw}"
 
-# 3. Remplacement dynamique dans les fichiers
+package_name="${vendor_slug}/$(echo "$bundle_name" | sed 's/\([A-Z]\)/-\1/g' | sed 's/^-//' | tr '[:upper:]' '[:lower:]')-bundle"
+
+echo -e "\n${YELLOW}⏳ Remplacement des patterns dans les fichiers...${NC}"
+
+# 2. Remplacement textuel de tous les jetons d'entreprise
 find . -type f \( -name "*.php" -o -name "*.json" -o -name "*.yaml" -o -name "*.md" -o -name "*.xml" -o -name "*.dist" \) ! -name "configure.sh" | while read -r file; do
-    # Remplacement du namespace/classe principale
-    sed -i "s/MonBundle/${bundle_class}/g" "$file"
-    # Remplacement de la classe de dépendance
-    sed -i "s/MonExtension/${extension_class}/g" "$file"
-    # AJUSTÉ ICI : Remplacement du nom composer basé sur ton vrai nom de dossier
-    sed -i "s/bundle-skeleton/${composer_name}/g" "$file"
-    # Remplacement du nom de la suite de tests PHPUnit
-    sed -i "s/Mon Bundle Test Suite/${test_suite_name} Test Suite/g" "$file"
+    sed -i "s/{{PACKAGE_NAME}}/${package_name}/g" "$file"
+    sed -i "s/{{VENDOR}}/${vendor_name}/g" "$file"
+    sed -i "s/{{BUNDLE}}/${bundle_name}/g" "$file"
+    sed -i "s/{{BUNDLE_CLASS}}/${bundle_class}/g" "$file"
+    sed -i "s/{{BUNDLE_SLUG}}/${bundle_slug}/g" "$file"
+    sed -i "s/{{NAMESPACE}}/${namespace}/g" "$file"
+    sed -i "s/{{NAMESPACE_ESCAPED}}/${namespace_escaped}/g" "$file"
 done
 
-# 4. Renommer les fichiers physiques pour correspondre au nouveau nom
-mv src/MonBundle.php "src/${bundle_class}.php"
-mv src/DependencyInjection/MonExtension.php "src/DependencyInjection/${extension_class}.php"
+# 3. Renommer le fichier physique de la classe de bundle principale
+mv "src/{{BUNDLE_CLASS}}.php" "src/${bundle_class}.php"
 
-echo -e "${GREEN}✅ Ton bundle est configuré avec succès !${NC}"
-echo -e "${CYAN}👉 Classe principale : ${bundle_class}.php${NC}"
-echo -e "${CYAN}👉 Paquet Composer   : florimond-jouffroy/${composer_name}${NC}\n"
+echo -e "${GREEN}✅ Configuration effectuée !${NC}"
+echo -e "${CYAN}👉 Paquet : ${package_name}${NC}"
+echo -e "${CYAN}👉 Alias  : ${bundle_slug}${NC}\n"
 
-# Nettoyage : Le script s'autodétruit
+# Autodestruction sécurisée
 rm -- "$0"

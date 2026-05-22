@@ -1,20 +1,28 @@
 {
-  "name": "florimond-jouffroy/bundle-skeleton",
-  "description": "Bundle réutilisable pour mes applications Symfony.",
+  "name": "{{PACKAGE_NAME}}",
+  "description": "Symfony bundle: {{VENDOR}}{{BUNDLE}}Bundle",
   "type": "symfony-bundle",
-  "license": "MIT",
+  "license": "proprietary",
+  "keywords": ["symfony", "bundle", "{{BUNDLE_SLUG}}"],
   "authors": [
-    {
-      "name": "Florimond Jouffroy"
-    }
+    { "name": "Florimond Jouffroy", "email": "florimond@example.com" }
   ],
+  "minimum-stability": "stable",
+  "prefer-stable": true,
   "require": {
-    "php": ">=8.2",
-    "symfony/framework-bundle": "^6.4|^7.0|^8.0"
+    "php": ">=8.4",
+    "symfony/config": "^7.4",
+    "symfony/dependency-injection": "^7.4",
+    "symfony/http-kernel": "^7.4"
   },
   "autoload": {
     "psr-4": {
-      "FlorimondJouffroy\\MonBundle\\": "src/"
+      "{{NAMESPACE_ESCAPED}}\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "{{NAMESPACE_ESCAPED}}\\Tests\\": "tests/"
     }
   }
 }

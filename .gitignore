@@ -1,11 +1,4 @@
-# Cache et dépendances Composer
 /vendor/
 composer.lock
-
-# Outils de relecture et IDE
-/.idea/
-/.vscode/
 .phpunit.result.cache
-
-# Fichiers de log ou de dump potentiels
-*.log
+/.phpunit.cache/
