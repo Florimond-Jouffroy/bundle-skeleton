@@ -18,25 +18,28 @@ default_bundle="Awesome"
 read -p "📦 Nom du Bundle (ex: Awesome, Log, Auth) [$default_bundle] : " bundle_name
 bundle_name=${bundle_name:-$default_bundle}
 
+# 🌟 SÉCURITÉ : Si l'utilisateur écrit "LogBundle", on nettoie pour ne garder que "Log"
+bundle_name_clean=$(echo "$bundle_name" | sed 's/Bundle$//')
+
 # Formatage des variables de remplacement
-bundle_class="${bundle_name}Bundle"
+bundle_class="${bundle_name_clean}Bundle"
 namespace="${vendor_name}\\${bundle_class}"
 namespace_escaped="${vendor_name}\\\\${bundle_class}"
 
-# Génération automatique du slug
+# Génération automatique du slug (ex: ube_awesome)
 vendor_slug=$(echo "$vendor_name" | tr '[:upper:]' '[:lower:]')
-bundle_slug_raw=$(echo "$bundle_name" | sed 's/\([A-Z]\)/_\1/g' | sed 's/^_//' | tr '[:upper:]' '[:lower:]')
+bundle_slug_raw=$(echo "$bundle_name_clean" | sed 's/\([A-Z]\)/_\1/g' | sed 's/^_//' | tr '[:upper:]' '[:lower:]')
 bundle_slug="${vendor_slug}_${bundle_slug_raw}"
 
-package_name="${vendor_slug}/$(echo "$bundle_name" | sed 's/\([A-Z]\)/-\1/g' | sed 's/^-//' | tr '[:upper:]' '[:lower:]')-bundle"
+package_name="${vendor_slug}/$(echo "$bundle_name_clean" | sed 's/\([A-Z]\)/-\1/g' | sed 's/^-//' | tr '[:upper:]' '[:lower:]')-bundle"
 
 echo -e "\n${YELLOW}⏳ Remplacement des patterns dans les fichiers...${NC}"
 
-# 2. Remplacement textuel (Utilisation de | comme séparateur sed pour gérer les antislashs)
+# 2. Remplacement textuel (Utilisation de | comme séparateur pour digérer les antislashs)
 find . -type f \( -name "*.php" -o -name "*.json" -o -name "*.yaml" -o -name "*.md" -o -name "*.xml" -o -name "*.dist" \) ! -name "configure.sh" | while read -r file; do
     sed -i "s|{{PACKAGE_NAME}}|${package_name}|g" "$file"
     sed -i "s|{{VENDOR}}|${vendor_name}|g" "$file"
-    sed -i "s|{{BUNDLE}}|${bundle_name}|g" "$file"
+    sed -i "s|{{BUNDLE}}|${bundle_name_clean}|g" "$file"
     sed -i "s|{{BUNDLE_CLASS}}|${bundle_class}|g" "$file"
     sed -i "s|{{BUNDLE_SLUG}}|${bundle_slug}|g" "$file"
     sed -i "s|{{NAMESPACE}}|${namespace}|g" "$file"
